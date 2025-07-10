@@ -1,12 +1,16 @@
 const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
-
+const path = require('path')
 
 const app = express()
 app.use(cors())
 app.use(express.json())
 app.use(express.static('build'))
+
+app.get('*', (req, res) => {
+  res.sendFile(path.resolve(__dirname, 'build', 'index.html'))
+})
 
 morgan.token('body', (req) => {
   return req.method === 'POST' ? JSON.stringify(req.body) : ''
@@ -21,10 +25,10 @@ let persons = [
   { id: 4, name: "Mary Poppendieck", number: "39-23-6423122" }
 ]
 
-// Página inicial
-app.get('/', (req, res) => {
-  res.send('<h1>Hello World!</h1>')
-})
+// // Página inicial
+// app.get('/', (req, res) => {
+//   res.send('<h1>Hello World!</h1>')
+// })
 
 // GET all
 app.get('/api/persons', (req, res) => {
