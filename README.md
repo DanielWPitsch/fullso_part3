@@ -104,3 +104,7 @@ comandos bash. Para que os comandos bash acima funcionem, é possível alterar o
 
 npm config set script-shell "C:\\Program Files\\git\\bin\\bash.exe"
 npm config set script-shell "C:\\Users\\daniel.pitsch\\AppData\\Local\\Programs\\Git\\bin\\bash.exe"
+
+18. nas dependencias do backend em package.json (usar só em ambiente de desenvolvimento):
+
+"proxy": "http://localhost:3001"
