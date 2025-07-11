@@ -93,9 +93,12 @@ app.get('/info', (req, res) => {
   `)
 })
 
-app.get('*', (req, res) => {
-  res.sendFile(path.resolve(__dirname, 'build', 'index.html'))
-})
+// Rota fallback para frontend (somente em produção)
+if (process.env.NODE_ENV === 'production') {
+  app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, 'build', 'index.html'))
+  })
+}
 
 const PORT = 3001
 app.listen(PORT, () => {
