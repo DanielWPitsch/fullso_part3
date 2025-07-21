@@ -13,7 +13,6 @@ const Notification = ({ message }) => {
   );
 };
 
-
 const App = () => {
   const [persons, setPersons] = useState([]) 
   const [newName, setNewName] = useState('')

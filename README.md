@@ -108,3 +108,61 @@ npm config set script-shell "C:\\Users\\daniel.pitsch\\AppData\\Local\\Programs\
 18. nas dependencias do backend em package.json (usar só em ambiente de desenvolvimento):
 
 "proxy": "http://localhost:3001"
+
+19. As Ferramentas do Desenvolvedor do Chrome:
+
+node --inspect index.js
+
+20. Obs.: Uma versão mais recente do Visual Studio Code pode ter Run em vez de Debug. Além disso, talvez você 
+precise configurar seu arquivo launch.json para iniciar a depuração. Isso pode ser feito selecionando Add Configuration... 
+no menu, que está localizado ao lado do botão verde de play e acima do menu VARIABLES, selecionando Run "npm start" in a 
+debug terminal. Para instruções de configuração mais detalhadas, leia a documentação sobre depuração do Visual Studio Code.
+
+21. Também é possível depurar o código com o Console do Desenvolvedor do Chrome, iniciando a aplicação com o comando:
+
+node --inspect index.js
+
+22. MongoDB Atlas, ----, mongose:
+https://www.youtube.com/watch?v=bBA9rUdqmgY
+https://www.youtube.com/watch?v=-AQZuPL1hD0
+
+23. Criar database: (cluster)
+
+Free => aws, sao paulo => create deployment
+
+24. Quickstart:
+
+Username, Password => Create user => Add my current ip adress => Finish and close => Go to database
+
+25. Clusters:
+
+Connect => Drivers => Node.js
+nom install mongodb
+mongodb+srv://danielwarellapitsch:<db_password>@cluster0...  => Done
+
+26. usaremos a biblioteca Mongoose, que oferece uma API de alto nível, para instala-la:
+
+npm install mongoose
+
+27. Ainda não vamos adicionar nenhum código relacionado ao Mongo em nosso backend. Em vez disso, 
+vamos fazer uma aplicação prática criando um novo arquivo, mongo.js.
+Depois de criado o arquivo vamos rodar:
+
+node mongo.js yourpassword
+
+28. Browse collections:
+Collections => podemos ver que a api que foi criada no mongo.js
+
+29. mudar nome padrão:
+
+const url =
+  `mongodb+srv://fullstack:${password}@cluster0.o1opl.mongodb.net/PhonebookApp?retryWrites=true&w=majority`
+
+30. post:
+
+node mongo.js suasenha Anna 040-1234556
+
+31. get:
+
+node mongo.js suasenha
+
