@@ -20,6 +20,7 @@ const App = () => {
   const [filter, setFilter] = useState('');
   const [errorMessage, setErrorMessage] = useState('some error happened...')
   const [notification, setNotification] = useState(null);
+  const [editingPerson, setEditingPerson] = useState(null)
 
 
   const handleNameChange = (e) => setNewName(e.target.value)
@@ -100,6 +101,32 @@ const App = () => {
     }
   }
 
+  const handleEdit = (person) => {
+    setEditingPerson(person);
+    setNewName(person.name);
+    setNewNumber(person.number);
+  };
+
+  const handleUpdate = (e) => {
+    e.preventDefault();
+    const updated = { ...editingPerson, name: newName, number: newNumber }; //new name para editar o nome tambem
+
+    personService
+      .update(editingPerson.id, updated)
+      .then(returned => {
+        setPersons(persons.map(p => p.id !== editingPerson.id ? p : returned));
+        showNotification(`Updated ${editingPerson.name}`, 'success');
+        setEditingPerson(null);
+        setNewName('');
+        setNewNumber('');
+      })
+      .catch(err => {
+        showNotification(`Failed to update ${editingPerson.name}`, 'error');
+        console.error(err);
+      });
+  };
+
+
   const filteredPersons = persons.filter(person =>
     person.name.toLowerCase().includes(filter.toLowerCase())
   );
@@ -110,14 +137,20 @@ const App = () => {
       <h2>Phonebook</h2>
       <Filter filter={filter} handleFilterChange={handleFilterChange} />
       <PersonForm
-        newName = {newName}
-        newNumber = {newNumber}
-        handleNameChange = {handleNameChange}
-        handleNumberChange = {handleNumberChange}
-        handleSubmit = {handleSubmit}      
+        newName={newName}
+        newNumber={newNumber}
+        handleNameChange={handleNameChange}
+        handleNumberChange={handleNumberChange}
+        handleSubmit={handleSubmit}
+        handleUpdate={handleUpdate}
+        editingPerson={editingPerson}
       />
       <h2>Numbers</h2>
-      <Persons persons={filteredPersons} handleDelete={handleDelete} />
+      <Persons
+        persons={filteredPersons}
+        handleDelete={handleDelete}
+        handleEdit={handleEdit}
+      />
     </div>
   )
 }

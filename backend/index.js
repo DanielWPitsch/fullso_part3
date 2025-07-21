@@ -1,10 +1,12 @@
 require('dotenv').config()
 const express = require('express')
 const mongoose = require('mongoose')
+const Person = require('./models/person')
+const errorHandler = require('./middleware/errorHandler')
 
 const app = express()
 
-let persons = []
+// let persons = []
 
 const requestLogger = (request, response, next) => {
   console.log('Method:', request.method)
@@ -18,23 +20,6 @@ app.use(requestLogger)
 app.use(express.static('dist'))
 app.use(express.json())
 
-const url = process.env.MONGODB_URI
-
-mongoose.set('strictQuery',false)
-mongoose.connect(url)
-.then(result => {
-    console.log('connected to MongoDB')
-  })
-  .catch((error) => {
-    console.log('error connecting to MongoDB:', error.message)
-  })
-
-const personSchema = new mongoose.Schema({
-  name: String,
-  number: String,
-});
-
-const Person = mongoose.model('Person', personSchema)
 
 app.get('/', (request, response) => {
   response.send('<h1>Hello World!</h1>')
@@ -46,10 +31,16 @@ app.get('/api/persons', (request, response) => {
   })
 })
 
-app.get('/api/persons/:id', (request, response) => {
-  Person.findById(request.params.id).then((person) => {
-    response.json(person)
-  })
+app.get('/api/persons/:id', (request, response, next) => {
+  Person.findById(request.params.id)
+    .then(person => {
+      if (person) {
+        response.json(person)
+      } else {
+        response.status(404).end() 
+      }
+    })
+    .catch(error => next(error))
 })
 
 app.post('/api/persons', (request, response) => {
@@ -69,11 +60,44 @@ app.post('/api/persons', (request, response) => {
   })
 })
 
-app.delete('/api/persons/:id', (request, response) => {
-  const id = request.params.id
-  Person.findByIdAndRemove(id).then(() => {
-    response.status(204).end()
-  })  
+app.get('/info', (request, response, next) => {
+  Person.countDocuments({})
+    .then(count => {
+      const info = `
+        <p>Phonebook has info for ${count} people</p>
+        <p>${new Date()}</p>
+      `
+      response.send(info)
+    })
+    .catch(error => next(error))
+})
+
+
+app.put('/api/persons/:id', (request, response, next) => {
+  const { name, number } = request.body
+
+  Person.findById(request.params.id)
+    .then((person) => {
+      if (!person) {
+        return response.status(404).end()
+      }
+
+      person.name = name
+      person.number = number
+
+      return person.save().then((updatedPerson) => {
+        response.json(updatedPerson)
+      })
+    })
+    .catch((error) => next(error))
+})
+
+app.delete('/api/persons/:id', (request, response, next) => {
+  Person.findByIdAndDelete(request.params.id)
+    .then((result) => {
+      response.status(204).end()
+    })
+    .catch((error) => next(error))
 })
 
 const unknownEndpoint = (request, response) => {
@@ -81,6 +105,7 @@ const unknownEndpoint = (request, response) => {
 }
 
 app.use(unknownEndpoint)
+app.use(errorHandler)
 
 const PORT = process.env.PORT
 app.listen(PORT, () => {
@@ -104,15 +129,3 @@ app.listen(PORT, () => {
 //     res.sendFile(path.resolve(__dirname, 'build', 'index.html'))
 //   })
 // }
-
-
-
-// // Endpoint /info
-// app.get('/info', (req, res) => {
-//   const count = persons.length
-//   const date = new Date()
-//   res.send(`
-//     <p>Phonebook has info for ${count} people</p>
-//     <p>${date}</p>
-//   `)
-// })

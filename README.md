@@ -166,3 +166,11 @@ node mongo.js suasenha Anna 040-1234556
 
 node mongo.js suasenha
 
+32. Rodar backend:
+
+npm run dev
+
+33. Rodar frontend:
+
+npm start --reset-cache
+
