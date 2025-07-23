@@ -157,6 +157,7 @@ Collections => podemos ver que a api que foi criada no mongo.js
 
 const url =
   `mongodb+srv://fullstack:${password}@cluster0.o1opl.mongodb.net/PhonebookApp?retryWrites=true&w=majority`
+  MONGODB_URI=mongodb+srv://danielwarellapitsch:mongo@cluster0.tboy7ef.mongodb.net/PhonebookApp?retryWrites=true&w=majority&appName=Cluster0
 
 30. post:
 

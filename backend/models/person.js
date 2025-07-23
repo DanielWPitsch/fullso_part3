@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 mongoose.set('strictQuery',false)
 
 const url = process.env.MONGODB_URI
+const phoneRegex = /^(\d{2,3}-)?\d{6,}$/;
 
 console.log('connecting to', url)
 mongoose
