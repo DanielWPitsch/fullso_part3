@@ -137,7 +137,7 @@ Username, Password => Create user => Add my current ip adress => Finish and clos
 25. Clusters:
 
 Connect => Drivers => Node.js
-nom install mongodb
+npm install mongodb
 mongodb+srv://danielwarellapitsch:<db_password>@cluster0...  => Done
 
 26. usaremos a biblioteca Mongoose, que oferece uma API de alto nível, para instala-la:
@@ -157,7 +157,7 @@ Collections => podemos ver que a api que foi criada no mongo.js
 
 const url =
   `mongodb+srv://fullstack:${password}@cluster0.o1opl.mongodb.net/PhonebookApp?retryWrites=true&w=majority`
-  MONGODB_URI=mongodb+srv://danielwarellapitsch:mongo@cluster0.tboy7ef.mongodb.net/PhonebookApp?retryWrites=true&w=majority&appName=Cluster0
+ 
 
 30. post:
 
@@ -175,3 +175,5 @@ npm run dev
 
 npm start --reset-cache
 
+envolver em aspas duplas: 
+ "MONGODB_URI=mongodb+srv://danielwarellapitsch:mongo@cluster0.tboy7ef.mongodb.net/PhonebookApp?retryWrites=true&w=majority&appName=Cluster0"
