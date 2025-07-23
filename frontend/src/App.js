@@ -44,11 +44,11 @@ const App = () => {
 
 
   const handleSubmit = (e) => {
-    e.preventDefault();
-    const existingPerson = persons.find(person => person.name === newName);
+  e.preventDefault();
+  const existingPerson = persons.find(person => person.name === newName);
 
-    if(existingPerson){
-      const confirmUpdate = window.confirm(
+  if (existingPerson) {
+    const confirmUpdate = window.confirm(
       `${newName} is already added to the phonebook. Replace the old number with the new one?`
     );
 
@@ -61,18 +61,23 @@ const App = () => {
           setPersons(persons.map(p => p.id !== existingPerson.id ? p : returnedPerson));
           setNewName('');
           setNewNumber('');
-           showNotification(`Updated ${newName}'s number`, 'success');
+          showNotification(`Updated ${newName}'s number`, 'success');
         })
         .catch(error => {
-          showNotification(`Failed to update ${newName}`, 'error');
+          if (error.response && error.response.data && error.response.data.error) {
+            showNotification(error.response.data.error, 'error');
+          } else {
+            showNotification(`Failed to update ${newName}`, 'error');
+          }
           console.error(error);
         });
-      }
-      return;
     }
-    const newPerson = {name: newName, number: newNumber};
-    
-    personService
+    return;
+  }
+
+  const newPerson = { name: newName, number: newNumber };
+
+  personService
     .create(newPerson)
     .then(returnedPerson => {
       setPersons(persons.concat(returnedPerson));
@@ -81,10 +86,15 @@ const App = () => {
       showNotification(`Added ${newName}`, 'success');
     })
     .catch(error => {
-      console.error('Erro ao adicionar contato:', error);
-      showNotification('Failed to add contact', 'error');
+      if (error.response && error.response.data && error.response.data.error) {
+        showNotification(error.response.data.error, 'error');
+      } else {
+        showNotification('Failed to add contact', 'error');
+      }
+      console.error(error);
     });
-  }
+};
+
 
   const handleDelete = (id) => {
     const person = persons.find(p => p.id === id)
