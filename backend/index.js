@@ -43,10 +43,10 @@ app.get('/api/persons/:id', (request, response, next) => {
     .catch(error => next(error))
 })
 
-app.post('/api/persons', (request, response) => {
+app.post('/api/persons', (request, response, next) => {
   const body = request.body
 
-  if (!body.name || !body.number) {
+  if (!body.name || !body.number || body.name === undefined || body.number === undefined) {
     return response.status(400).json({ error: 'name or number missing' })
   }
 
@@ -55,9 +55,11 @@ app.post('/api/persons', (request, response) => {
     number: body.number,
   })
 
-  person.save().then((savedPerson) => {
-    response.json(savedPerson)
-  })
+  person.save()
+    .then((savedPerson) => {
+      response.json(savedPerson)
+    })
+    .catch(error => next(error))
 })
 
 app.get('/info', (request, response, next) => {
@@ -76,7 +78,11 @@ app.get('/info', (request, response, next) => {
 app.put('/api/persons/:id', (request, response, next) => {
   const { name, number } = request.body
 
-  Person.findById(request.params.id)
+  Person.findById(
+    request.params.id,
+    { name, number },
+    { new: true, runValidators: true, context: 'query' }
+  )
     .then((person) => {
       if (!person) {
         return response.status(404).end()
