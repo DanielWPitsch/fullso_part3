@@ -1,6 +1,7 @@
 require('dotenv').config()
 const express = require('express')
 const mongoose = require('mongoose')
+const path = require('path')
 const Person = require('./models/person')
 const errorHandler = require('./middleware/errorHandler')
 
@@ -20,13 +21,10 @@ const requestLogger = (request, response, next) => {
 }
 
 app.use(requestLogger)
-app.use(express.static('dist'))
 app.use(express.json())
 
-
-// app.get('/', (request, response) => {
-//   response.send('<h1>Hello World!</h1>')
-// })
+// Serve static files from React app
+app.use(express.static(path.join(__dirname, 'dist')))
 
 app.get('/api/persons', (request, response) => {
   Person.find({}).then((persons) => {
@@ -107,6 +105,10 @@ app.delete('/api/persons/:id', (request, response, next) => {
       response.status(204).end()
     })
     .catch((error) => next(error))
+})
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'))
 })
 
 const unknownEndpoint = (request, response) => {
