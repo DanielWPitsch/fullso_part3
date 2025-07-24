@@ -4,9 +4,13 @@ const mongoose = require('mongoose')
 const Person = require('./models/person')
 const errorHandler = require('./middleware/errorHandler')
 
-const app = express()
+mongoose.connect(process.env.MONGODB_URI)
+  .then(() => console.log('Connected to MongoDB'))
+  .catch(error => console.log('error connecting to MongoDB:', error.message));
 
-// let persons = []
+const app = express()
+const PORT = process.env.PORT || 3001
+//const PORT = process.env.PORT
 
 const requestLogger = (request, response, next) => {
   console.log('Method:', request.method)
@@ -113,7 +117,7 @@ const unknownEndpoint = (request, response) => {
 app.use(unknownEndpoint)
 app.use(errorHandler)
 
-const PORT = process.env.PORT
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
