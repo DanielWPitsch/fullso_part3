@@ -109,7 +109,7 @@ app.delete('/api/persons/:id', (request, response, next) => {
 
 // Catch-all route for React - must come last
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+  res.sendFile(path.join(__dirname, 'dist', 'index.js'));
 });
 
 // Error handling middleware
