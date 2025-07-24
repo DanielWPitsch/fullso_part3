@@ -10,7 +10,6 @@ mongoose.connect(process.env.MONGODB_URI)
 
 const app = express()
 const PORT = process.env.PORT || 3001
-//const PORT = process.env.PORT
 
 const requestLogger = (request, response, next) => {
   console.log('Method:', request.method)
@@ -25,9 +24,9 @@ app.use(express.static('dist'))
 app.use(express.json())
 
 
-app.get('/', (request, response) => {
-  response.send('<h1>Hello World!</h1>')
-})
+// app.get('/', (request, response) => {
+//   response.send('<h1>Hello World!</h1>')
+// })
 
 app.get('/api/persons', (request, response) => {
   Person.find({}).then((persons) => {
