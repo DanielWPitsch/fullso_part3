@@ -1,142 +1,121 @@
-require('dotenv').config()
-const express = require('express')
-const mongoose = require('mongoose')
-const path = require('path')
-const Person = require('./models/person')
-const errorHandler = require('./middleware/errorHandler')
+require('dotenv').config();
+const express = require('express');
+const mongoose = require('mongoose');
+const path = require('path');
+const Person = require('./models/person');
+const errorHandler = require('./middleware/errorHandler');
 
+// MongoDB connection with improved error handling
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('Connected to MongoDB'))
-  .catch(error => console.log('error connecting to MongoDB:', error.message));
+  .catch(error => {
+    console.log('Error connecting to MongoDB:', error.message);
+    process.exit(1); // Exit if DB connection fails
+  });
 
-const app = express()
-const PORT = process.env.PORT || 3001
+const app = express();
+const PORT = process.env.PORT || 3001;
 
+// Middleware
 const requestLogger = (request, response, next) => {
-  console.log('Method:', request.method)
-  console.log('Path:  ', request.path)
-  console.log('Body:  ', request.body)
-  console.log('---')
-  next()
-}
+  console.log('Method:', request.method);
+  console.log('Path:  ', request.path);
+  console.log('Body:  ', request.body);
+  console.log('---');
+  next();
+};
 
-app.use(requestLogger)
-app.use(express.json())
+app.use(requestLogger);
+app.use(express.json());
 
 // Serve static files from React app
-app.use(express.static(path.join(__dirname, 'dist')))
+app.use(express.static(path.join(__dirname, 'dist')));
 
-app.get('/api/persons', (request, response) => {
-  Person.find({}).then((persons) => {
-    response.json(persons)
-  })
-})
+// API routes
+app.get('/api/persons', (request, response, next) => {
+  Person.find({})
+    .then(persons => response.json(persons))
+    .catch(error => next(error));
+});
 
 app.get('/api/persons/:id', (request, response, next) => {
   Person.findById(request.params.id)
     .then(person => {
       if (person) {
-        response.json(person)
+        response.json(person);
       } else {
-        response.status(404).end() 
+        response.status(404).end();
       }
     })
-    .catch(error => next(error))
-})
+    .catch(error => next(error));
+});
 
 app.post('/api/persons', (request, response, next) => {
-  const body = request.body
+  const body = request.body;
 
-  if (!body.name || !body.number || body.name === undefined || body.number === undefined) {
-    return response.status(400).json({ error: 'name or number missing' })
+  if (!body.name || !body.number) {
+    return response.status(400).json({ 
+      error: 'name and number are required' 
+    });
   }
 
   const person = new Person({
     name: body.name,
     number: body.number,
-  })
+  });
 
   person.save()
-    .then((savedPerson) => {
-      response.json(savedPerson)
-    })
-    .catch(error => next(error))
-})
+    .then(savedPerson => response.json(savedPerson))
+    .catch(error => next(error));
+});
 
 app.get('/info', (request, response, next) => {
   Person.countDocuments({})
     .then(count => {
-      const info = `
+      response.send(`
         <p>Phonebook has info for ${count} people</p>
         <p>${new Date()}</p>
-      `
-      response.send(info)
+      `);
     })
-    .catch(error => next(error))
-})
-
+    .catch(error => next(error));
+});
 
 app.put('/api/persons/:id', (request, response, next) => {
-  const { name, number } = request.body
+  const { name, number } = request.body;
 
-  Person.findById(
+  Person.findByIdAndUpdate(
     request.params.id,
     { name, number },
-    { new: true, runValidators: true, context: 'query' }
+    { 
+      new: true,
+      runValidators: true,
+      context: 'query' 
+    }
   )
-    .then((person) => {
-      if (!person) {
-        return response.status(404).end()
+    .then(updatedPerson => {
+      if (!updatedPerson) {
+        return response.status(404).end();
       }
-
-      person.name = name
-      person.number = number
-
-      return person.save().then((updatedPerson) => {
-        response.json(updatedPerson)
-      })
+      response.json(updatedPerson);
     })
-    .catch((error) => next(error))
-})
+    .catch(error => next(error));
+});
 
 app.delete('/api/persons/:id', (request, response, next) => {
   Person.findByIdAndDelete(request.params.id)
-    .then((result) => {
-      response.status(204).end()
-    })
-    .catch((error) => next(error))
-})
+    .then(() => response.status(204).end())
+    .catch(error => next(error));
+});
 
+// Catch-all route for React - must come last
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'dist', 'index.html'))
-})
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+});
 
-const unknownEndpoint = (request, response) => {
-  response.status(404).send({ error: 'unknown endpoint' })
-}
-
-app.use(unknownEndpoint)
-app.use(errorHandler)
-
+// Error handling middleware
+app.use(errorHandler);
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`)
-})
-
-
-// ------------------------------------------------------------
-
-//Essa parte causou o primeiro problema 
-// // Página inicial
-// app.get('/', (req, res) => {
-//   res.send('<h1>Hello World!</h1>')
-// })
-//
-//Essa parte causou o primeiro erro no deploy 
-//
-// // Rota fallback para frontend (somente em produção)
-// if (process.env.NODE_ENV === 'production') {
-//   app.get('*', (req, res) => {
-//     res.sendFile(path.resolve(__dirname, 'build', 'index.html'))
-//   })
-// }
+  console.log(`Server running on port ${PORT}`);
+  console.log(`MongoDB URI: ${process.env.MONGODB_URI}`);
+});
